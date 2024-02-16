@@ -123,9 +123,9 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>com.mycompany</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.3</version>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<version>8.1.0</version>
 		</dependency>
 	</dependencies>
 
