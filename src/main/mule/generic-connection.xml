@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="generic-connection-flow-to-get-the-data" doc:id="9c753ecc-3f74-402a-96d3-37c0d54cdaea" >
+		<http:listener doc:name="Listener" doc:id="624934c3-7e90-4e25-85b0-7868787a6351" config-ref="HTTP_Listener_config" path="/genericget"/>
+		<logger level="INFO" doc:name="start-log" doc:id="10d31404-d45f-42e3-861c-9a0bd26022a6" message="===start-logger===="/>
+		<logger level="INFO" doc:name="before-payload" doc:id="4cbbdaa8-725e-47e0-924d-611d82c4b986" message="#[payload]"/>
+		<db:select doc:name="Select" doc:id="6ca03085-f2db-4152-b15c-236f4a442c7d" config-ref="Database_Config_generic">
+			<db:sql ><![CDATA[SELECT * FROM "public"."department1" LIMIT 100]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="transform-the-data-to-json" doc:id="8e9157d0-c9ff-4f55-aea9-a43b5320b61a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="after-payload" doc:id="95b5ec9a-d079-44f3-8c98-49a9398d7f4b" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"API-Name": "basic-generic-database-opertions",&#10;	"Corelation-ID": correlationId,&#10;	"message":"after-retrieving-the-data-from-the-DB",&#10;	"payload": payload&#10;&#10;}]'/>
+		<logger level="INFO" doc:name="end-log" doc:id="57d8989e-f58f-4b69-8d70-3be213d8cdbe" message="=====end-logger=====" />
+	</flow>
+	<flow name="generic-connection-flow-to-insert-the-data" doc:id="4670cddf-05cf-4d12-b023-1d2424e288d2" >
+		<http:listener doc:name="Listener" doc:id="383716b5-0f1e-49b0-888c-603fc37f5969" config-ref="HTTP_Listener_config" path="/genericinsert" />
+		<logger level="INFO" doc:name="start-log" doc:id="bdbd7b30-d66f-47de-ba51-8d921c1513de" message="===start-logger====" />
+		<logger level="INFO" doc:name="before-payload" doc:id="062b30cd-85c6-40e5-9480-5d3e73f88869" message="#[payload]" />
+		<db:insert doc:name="Insert" doc:id="d7651e2d-afe9-402c-a2fb-0fe305f3c41b" config-ref="Database_Config_generic">
+			<db:sql ><![CDATA[
+insert into empdetails(Empno,FirstName,LastName,WorkDept,PhoneNo,Hiredate,Job,Sex,Birthday,Salary) values (:Empno,:FirstName,:LastName,:WorkDept,:PhoneNo,:Hiredate,:Job,:Sex,:Birthday,:Salary);
+]]></db:sql>
+			<db:input-parameters ><![CDATA[#[output application/json
+---
+{
+	"Empno": payload.Empno[0],
+	"FirstName": payload.FirstName[0],
+	"LastName":payload.LastName[0],
+	"WorkDept": payload.WorkDept[0],
+	"PhoneNo": payload.PhoneNo[0],
+	"Hiredate": payload.Hiredate[0],
+	"Job":payload.Job[0],
+	"Sex": payload.Sex[0],
+	"Birthday": payload.Birthday[0],
+	"Salary": payload.Salary[0]	
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="transform-the-data-to-json" doc:id="23d98cf1-35cf-43d5-90f4-4add71d9ff7d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="after-payload" doc:id="a40ea5e1-e3b6-45b6-8860-2515a956605f" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"API-Name": "basic-generic-database-opertions",&#10;	"Corelation-ID": correlationId,&#10;	"message":"after-retrieving-the-data-from-the-DB",&#10;	"payload": payload&#10;&#10;}]' />
+		<logger level="INFO" doc:name="end-log" doc:id="ff0e9485-a947-4611-9871-36803a673dc9" message="=====end-logger=====" />
+	</flow>
+	<flow name="generic-connection-flow-to-delete-the-data" doc:id="be4fd6ff-5b1d-485d-805b-c98b6f98d64c" >
+		<http:listener doc:name="Listener" doc:id="c3231f5e-efa7-43ef-92c7-cf0b4a5e6fd8" config-ref="HTTP_Listener_config" path="/genericdeletion" />
+		<logger level="INFO" doc:name="start-log" doc:id="feb87f43-7275-40a7-bd81-e5cb77ccb651" message="===start-logger====" />
+		<logger level="INFO" doc:name="before-payload" doc:id="c7297228-205c-4796-b3d8-22f9893129ee" message="#[payload]" />
+		<db:delete doc:name="Delete" doc:id="46628194-f0fe-4b09-87f6-bca7f484f0f0" config-ref="Database_Config_generic">
+			<db:sql ><![CDATA[
+delete from empdetails where Empno = :Empno;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[output application/json
+---
+{
+	"Empno": payload.Empno[0]
+}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="transform-the-data-to-json" doc:id="d9b360bf-176a-48a5-ae4f-1a3c785b07a0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="after-payload" doc:id="22cf8852-281c-4c1d-9905-4b9aa7364b02" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"API-Name": "basic-generic-database-opertions",&#10;	"Corelation-ID": correlationId,&#10;	"message":"after-retrieving-the-data-from-the-DB",&#10;	"payload": payload&#10;&#10;}]' />
+		<logger level="INFO" doc:name="end-log" doc:id="af9f238f-b7d2-47ab-a433-1023b4b2da20" message="=====end-logger=====" />
+	</flow>
+	<flow name="generic-connection-flow-to-update-the-data" doc:id="4133403c-8464-4dd4-871d-429023f5bc7f" >
+		<http:listener doc:name="Listener" doc:id="f46dc5b7-0164-441e-8d82-257f1926d0ae" config-ref="HTTP_Listener_config" path="/genericupdate" />
+		<logger level="INFO" doc:name="start-log" doc:id="427a7ca2-698a-42af-9703-3ab2bd3d80d6" message="===start-logger====" />
+		<logger level="INFO" doc:name="before-payload" doc:id="f162474d-e9ce-43b2-82fc-c27268c5a380" message="#[payload]" />
+		<db:update doc:name="Update" doc:id="bf3cb12a-f2e8-45bf-b9c3-99897c63bdfa" config-ref="Database_Config_generic">
+			<db:sql ><![CDATA[UPDATE empdetails SET FirstName = :FirstName WHERE Empno = :Empno;
+
+]]></db:sql>
+			<db:input-parameters ><![CDATA[#[output application/json
+---
+{
+	"Empno": payload.Empno[0],
+	"FirstName": payload.FirstName[0]
+	
+}]]]></db:input-parameters>
+		</db:update>
+		<ee:transform doc:name="transform-the-data-to-json" doc:id="42637e50-423c-4353-8822-31e86839c329" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="after-payload" doc:id="7f1bc0ea-64cf-4f1f-b6e8-421d65fc5b18" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"API-Name": "basic-generic-database-opertions",&#10;	"Corelation-ID": correlationId,&#10;	"message":"after-retrieving-the-data-from-the-DB",&#10;	"payload": payload&#10;&#10;}]' />
+		<logger level="INFO" doc:name="end-log" doc:id="6ae0b637-f992-4ddc-bc84-0a2a6e5c75b8" message="=====end-logger=====" />
+	</flow>
+</mule>

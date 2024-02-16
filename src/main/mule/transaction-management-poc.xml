@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<flow name="transaction-management-local-flow" doc:id="f30fc7bf-0596-4767-ae2a-2f4bbe589c73" >
+		<http:listener doc:name="Listener" doc:id="1ad4f33f-58e7-40de-8398-1825d2d648cf" config-ref="HTTP_Listener_config" path="/localTrans"/>
+		<logger level="INFO" doc:name="start-log" doc:id="bb12d406-1f15-481d-b433-b8d57b2cf1c6" message="===start-logger===="/>
+		<logger level="INFO" doc:name="before-inserting-the-data-from-DB" doc:id="292058a2-06f3-4d2c-94aa-b76d895506ba" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"API-Name": "local-transaction",&#10;	"Corelation-ID": correlationId,&#10;	"message":"before-inserting-the-data-into-the-DB",&#10;	"payload": payload&#10;&#10;}]'/>
+		<try doc:name="Try" doc:id="550fd90a-4996-4b64-9491-0e14a75cdfb4" transactionalAction="BEGIN_OR_JOIN">
+			<logger level="INFO" doc:name="before-payload" doc:id="7b1cd782-8200-470f-9906-6238ec2b1a86" message="#[payload]"/>
+			<db:insert doc:name="Insert-data-into-the-AMERICAN-DB1" doc:id="45cb84b6-9af1-4005-99e4-39797e44c59b" config-ref="Database_Config" target="dbResponse" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[insert into employee.db1 (NAME,ADDRESS) values (:NAME,:ADDRESS)]]></db:sql>
+				<db:input-parameters ><![CDATA[#[output application/json
+---
+{
+	"NAME": payload.Name[0],
+	"ADDRESS": payload.Address[0]
+}]]]></db:input-parameters>
+			</db:insert>
+			<ee:transform doc:name="Transform Message" doc:id="fd34dd9a-78d6-4e93-843b-5d1535a8a7e4" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<db:insert doc:name="Insert-data-into-the-AMEICANN-DB2" doc:id="3a456818-89f9-416e-80f1-94151d508277" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[insert into employee.db2 (NAME,ADDRESS) values (:NAME,:ADDRESS)]]></db:sql>
+				<db:input-parameters ><![CDATA[#[output application/json
+---
+{
+	"NAME": payload.Name[0],
+	"ADDRESS": payload.Address[0]
+}]]]></db:input-parameters>
+			</db:insert>
+			<logger level="INFO" doc:name="after-payload" doc:id="4e013f1e-bbb3-418a-b931-a49071b93885" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"API-Name": "local-transaction",&#10;	"Corelation-ID": correlationId,&#10;	"message":"after-inserting-the-data-into-the-DB",&#10;	"payload": payload&#10;&#10;}]'/>
+		</try>
+		<logger level="INFO" doc:name="end-log" doc:id="de782b68-2b67-4fef-8a52-8c03d9439859" message="=====end-logger====="/>
+	</flow>
+	<flow name="transaction-management-XA-poc" doc:id="13d9b032-6a94-4967-9f7c-80f1f22f748e" >
+		<http:listener doc:name="Listener" doc:id="43959344-4de0-4586-98c9-74cc4c0b65b3" config-ref="HTTP_Listener_config" path="/xaTrans"/>
+		<logger level="INFO" doc:name="start-log" doc:id="58fa3c01-cf08-4ff1-b410-90c556a999ee" message="===start-logger====" />
+		<logger level="INFO" doc:name="before-inserting-the-data-from-DB" doc:id="a0132779-45f6-401d-a539-d4d34669e540" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"API-Name": "XA-transaction",&#10;	"Corelation-ID": correlationId,&#10;	"message":"before-inserting-the-data-into-the-DB",&#10;	"payload": payload&#10;&#10;}]' />
+		<try doc:name="Try" doc:id="7cccd75e-c474-4024-bc3c-5f614c25d3a6" transactionalAction="ALWAYS_BEGIN" transactionType="XA">
+			<logger level="INFO" doc:name="before-payload" doc:id="8eb407e5-70c6-4ca0-99c7-6d862513c006" message="#[payload]" />
+			<db:insert doc:name="Insert-data-into-the-AMERICAN-DB" doc:id="79d5665a-348f-468a-8067-eedc0a87a069" config-ref="Database_Config_XA" target="dbResponse" >
+				<db:sql ><![CDATA[insert into employee.db1 (NAME,ADDRESS) values (:NAME,:ADDRESS)]]></db:sql>
+				<db:input-parameters ><![CDATA[#[output application/json
+---
+{
+	"NAME": payload.Name[0],
+	"ADDRESS": payload.Address[0]
+}]]]></db:input-parameters>
+			</db:insert>
+			<ee:transform doc:name="Transform Message" doc:id="aedeb85b-7b3b-4083-ab63-398e456fc709" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<jms:publish doc:name="Publish-payload-to-the-queues" doc:id="38c584ee-3726-4113-ab57-87ca9b1f2b54" destination="Q.SAMPLE.USER.INFO" config-ref="JMS_Config">
+				<jms:message outboundContentType="application/json" />
+			</jms:publish>
+			<logger level="INFO" doc:name="after-payload" doc:id="f3e8a407-274d-49ad-b1b0-3095f73568a1" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"API-Name": "local-transaction",&#10;	"Corelation-ID": correlationId,&#10;	"message":"after-inserting-the-data-into-the-DB",&#10;	"payload": payload&#10;&#10;}]' />
+		</try>
+		<logger level="INFO" doc:name="end-log" doc:id="e3f4bad4-7268-4279-91c0-7364d68750e2" message="=====end-logger=====" />
+	</flow>
+</mule>
