@@ -51,16 +51,16 @@
 					</cloudHubDeployment>
 					<sharedLibraries>
 						<sharedLibrary>
+							<groupId>com.mysql</groupId>
+							<artifactId>mysql-connector-j</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
 							<groupId>org.apache.activemq</groupId>
 							<artifactId>activemq-all</artifactId>
 						</sharedLibrary>
 						<sharedLibrary>
-							<groupId>com.mycompany</groupId>
+							<groupId>org.postgresql</groupId>
 							<artifactId>postgresql</artifactId>
-						</sharedLibrary>
-						<sharedLibrary>
-							<groupId>com.mycompany</groupId>
-							<artifactId>mysql-connector-java</artifactId>
 						</sharedLibrary>
 					</sharedLibraries>
 					<classifier>mule-application</classifier>
@@ -95,15 +95,22 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-all</artifactId>
-			<version>5.16.5</version>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<version>8.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>42.7.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-all</artifactId>
+			<version>5.16.5</version>
+		</dependency>
+		<!-- <dependency> <groupId>com.mycompany</groupId> <artifactId>postgresql-42.7.1</artifactId> 
+			<version>0.1</version> </dependency> -->
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-file-connector</artifactId>
@@ -121,11 +128,6 @@
 			<artifactId>mule-objectstore-connector</artifactId>
 			<version>1.2.1</version>
 			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.mysql</groupId>
-			<artifactId>mysql-connector-j</artifactId>
-			<version>8.1.0</version>
 		</dependency>
 	</dependencies>
 
