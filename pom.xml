@@ -16,7 +16,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<app.runtime>4.4.0-20230320</app.runtime>
-		<mule.maven.plugin.version>4.0.0</mule.maven.plugin.version>
+		<mule.maven.plugin.version>4.3.0</mule.maven.plugin.version>
 	</properties>
 
 	<build>
@@ -40,14 +40,14 @@
 					<cloudHubDeployment>
 						<uri>https://anypoint.mulesoft.com</uri>
 						<muleVersion>${app.runtime}</muleVersion>
-						<username>${username}</username>
-						<password>${password}</password>
-						<environment>${environment}</environment>
-						<applicationName>${cloudhub.application.name}</applicationName>
-						<businessGroup>${business}</businessGroup>
-						<region>${region}</region>
-						<workerType>${vCore}</workerType>
-						<workers>${workers}</workers>
+						<username>Shaik_Rasheed16_02_24</username>
+						<password>Rasheed@0138</password>
+						<environment>Sandbox</environment>
+						<applicationName>trans-db</applicationName>
+						<!-- <businessGroup>${business}</businessGroup>
+						<region>${region}</region> -->
+						<workerType>Micro</workerType>
+						<workers>1</workers>
 					</cloudHubDeployment>
 					<sharedLibraries>
 						<sharedLibrary>
