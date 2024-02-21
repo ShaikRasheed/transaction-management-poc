@@ -41,7 +41,7 @@
 						<uri>https://anypoint.mulesoft.com</uri>
 						<muleVersion>${app.runtime}</muleVersion>
 						<username>Shaik_Rasheed16_02_24</username>
-						<password>Rasheed@0138</password>
+						<password>${anypoint.pass}</password>
 						<environment>Sandbox</environment>
 						<applicationName>trans-db</applicationName>
 						<!-- <businessGroup>${business}</businessGroup>
