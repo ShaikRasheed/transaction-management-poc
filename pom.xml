@@ -43,7 +43,7 @@
 						<username>Shaik_Rasheed16_02_24</username>
 						<password>${anypoint.pass}</password>
 						<environment>Sandbox</environment>
-						<applicationName>${app.name}</applicationName>
+						<applicationName>db-trans</applicationName>
 						<!-- <businessGroup>${business}</businessGroup>
 						<region>${region}</region> -->
 						<workerType>Macro</workerType>
